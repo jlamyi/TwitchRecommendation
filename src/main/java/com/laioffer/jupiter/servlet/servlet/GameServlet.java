@@ -1,0 +1,38 @@
+package com.laioffer.jupiter.servlet.servlet;
+
+import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.laioffer.jupiter.servlet.entity.Game;
+import com.laioffer.jupiter.servlet.external.TwitchClient;
+import com.laioffer.jupiter.servlet.external.TwitchException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+
+@WebServlet(name = "GameServlet", urlPatterns = {"/game"})
+public class GameServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String gameName = request.getParameter("game_name");
+        TwitchClient client = new TwitchClient();
+
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            if (gameName != null) {
+                response.getWriter().print(new ObjectMapper().writeValueAsString(client.searchGame(gameName)));
+            } else {
+                response.getWriter().print(new ObjectMapper().writeValueAsString(client.topGames(0)));
+            }
+        } catch (TwitchException e) {
+            throw new ServletException(e);
+        }
+    }
+}
